@@ -3,7 +3,9 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-
+using Microsoft.EntityFrameworkCore;
+using WebAPI.Data.Models;
+using WebAPI.Data.Repositories.Implementations;
 
 namespace WebAPI
 {
@@ -26,6 +28,7 @@ namespace WebAPI
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
+            services.AddLogging();
 
             // Register the Swagger generator, defining 1 or more Swagger documents
             services.AddSwaggerGen(c =>
@@ -34,6 +37,10 @@ namespace WebAPI
                 c.SwaggerDoc(swaggerDocName, new Swashbuckle.AspNetCore.Swagger.Info { Title = swaggerTitle, Version = swaggerVersion });
             });
 
+            services.AddDbContext<CarSalesContext>(options => options.UseSqlite(Configuration.GetConnectionString("DefaultConnection")));
+
+
+            services.AddScoped<CarRepository>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -63,6 +70,7 @@ namespace WebAPI
 
             app.UseHttpsRedirection();
             app.UseMvc();
+            
         }
     }
 }
